@@ -1,8 +1,14 @@
 // src/index.js
+// import fs from 'node:fs/promises';
 
-const message = 'Hello Node';
+// await fs.writeFile('output.txt', 'Привіт з Node.js!', 'utf8');
+// console.log('Дані успішно записані у файл.');
 
-console.log(message);
+// await fs.appendFile('output.txt', '\nЩе один рядок', 'utf8');
+// console.log('Дані успішно додані у файл.');
 
-const add = (a, b) => a + b;
-console.log(add(2, 3)); //
+// await fs.rename('output.txt', 'newfile.txt');
+// console.log('Файл успішно перейменовано.');
+
+// await fs.unlink('newfile.txt');
+// console.log('Файл успішно видалено.');
