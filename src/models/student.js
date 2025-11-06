@@ -1,6 +1,6 @@
 // src/models/student.js
 
-import { Schema } from 'mogoose';
+import { Schema } from 'mongoose';
 import { model } from 'mongoose';
 
 const studentSchema = new Schema(

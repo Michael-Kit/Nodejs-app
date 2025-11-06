@@ -1,35 +1,22 @@
 // src/server.js
 import express from 'express';
 import cors from 'cors';
-import pino from 'pino-http';
 import 'dotenv/config';
 import { connectMongoDB } from './db/connectMongoDB.js';
+
+import { logger } from './middleware/logger.js';
+import { notFoundHandler } from './middleware/notFoundHandler.js';
+import { errorHandler } from './middleware/errorHandler.js';
+import studentsRoutes from './routes/studentsRoutes.js';
 
 const app = express();
 // Використовуємо значення з .env або дефолтний порт 3000
 const PORT = process.env.PORT ?? 3000;
 
-// Middleware
-app.use(express.json());
-app.use(cors());
-app.use(
-  pino({
-    level: 'info',
-    transport: {
-      target: 'pino-pretty',
-      options: {
-        colorize: true,
-        translateTime: 'HH:MM:ss',
-        ignore: 'pid,hostname',
-        messageFormat:
-          '{req.method} {req.url} {res.statusCode} - {responseTime}ms',
-        hideObject: true,
-      },
-    },
-  }),
-);
-
-// Решта коду
+// Глобальні middleware
+app.use(logger); // 1.Логер першим бачить усі запити
+app.use(express.json()); // 2.Парсинг JSON-тіла
+app.use(cors()); // Дозвіл для запитів штших доменів
 
 // Логування часу
 app.use((req, res, next) => {
@@ -42,29 +29,13 @@ app.get('/', (req, res) => {
   res.status(200).json({ message: 'Hello, World!' });
 });
 
-// Маршрут для тестування middleware помилки
-app.get('/test-error', (req, res) => {
-  // Штучна помилка для прикладу
-  throw new Error('Something went wrong');
-});
+// підключаємо групу маршрутів студента
+app.use(studentsRoutes);
 
-// Middleware 404 (після всіх маршрутів)
-app.use((req, res) => {
-  res.status(404).json({ message: 'Route not found' });
-});
+app.use(notFoundHandler);
 
-// Middleware для обробки помилок (останнє)
-app.use((err, req, res, next) => {
-  console.error(err);
-
-  const isProd = process.env.NODE_ENV === 'production';
-
-  res.status(500).json({
-    message: isProd
-      ? 'Something went wrong. Please try again later.'
-      : err.message,
-  });
-});
+// Error якщо підчас запиту виникла помилка
+app.use(errorHandler);
 
 // підключення до MongoDB
 await connectMongoDB();
