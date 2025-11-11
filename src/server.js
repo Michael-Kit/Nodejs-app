@@ -2,6 +2,7 @@
 import express from 'express';
 import cors from 'cors';
 import 'dotenv/config';
+import { errors } from 'celebrate';
 import { connectMongoDB } from './db/connectMongoDB.js';
 
 import { logger } from './middleware/logger.js';
@@ -31,10 +32,13 @@ app.get('/', (req, res) => {
 
 // підключаємо групу маршрутів студента
 app.use(studentsRoutes);
-
+// обробка 404
 app.use(notFoundHandler);
 
-// Error якщо підчас запиту виникла помилка
+// обробка помилок від celebrate (валідація)
+app.use(errors());
+
+// Error якщо підчас запиту виникла помилка(глобальна обробка інших помилок)
 app.use(errorHandler);
 
 // підключення до MongoDB
