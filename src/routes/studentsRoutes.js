@@ -4,6 +4,7 @@ import { Router } from 'express';
 import { celebrate } from 'celebrate';
 
 import {
+  getStudentsSchema,
   createStudentSchema,
   studentIdParamSchema,
   updateStudentSchema,
@@ -19,7 +20,7 @@ import {
 
 const router = Router();
 
-router.get('/students', getStudents);
+router.get('/students', celebrate(getStudentsSchema), getStudents);
 
 router.get(
   '/students/:studentId',

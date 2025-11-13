@@ -5,8 +5,52 @@ import createHttpError from 'http-errors';
 
 // Отримати список усіх студентів
 export const getStudents = async (req, res) => {
-  const students = await Student.find();
-  res.status(200).json(students);
+  // Отримуємо параметри пагінаціі
+  const {
+    page = 1,
+    perPage = 10,
+    gender,
+    minAvgMark,
+    search,
+    sortBy = '_id',
+    sortOrder = 'asc',
+  } = req.query;
+  const skip = (page - 1) * perPage;
+  // Створюємо базовий запит
+  const studentsQuery = Student.find();
+  // Текстовий пошук по name (працює лише якщо створено текстовий індекс)
+  if (search) {
+    studentsQuery.where({
+      $text: { $search: search },
+    });
+  }
+  //Будуємо фільтр за статю
+  if (gender) {
+    studentsQuery.where('gender').equals(gender);
+  }
+  // фільтр за середнім балом
+  if (minAvgMark) {
+    studentsQuery.where('avgMark').gte(minAvgMark);
+  }
+  // Виконуємо одразу два запити паралельно
+  const [totalItems, students] = await Promise.all([
+    studentsQuery.clone().countDocuments(),
+    studentsQuery
+      .skip(skip)
+      .limit(perPage)
+      .sort({ [sortBy]: sortOrder }),
+  ]);
+  // Обчисляємо загальну кількість "сторінок"
+
+  const totalPages = Math.ceil(totalItems / perPage);
+
+  res.status(200).json({
+    page,
+    perPage,
+    totalItems,
+    totalPages,
+    students,
+  });
 };
 
 // Отримати одного студента за id

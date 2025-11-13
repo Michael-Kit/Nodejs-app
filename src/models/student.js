@@ -1,7 +1,6 @@
 // src/models/student.js
 
-import { Schema } from 'mongoose';
-import { model } from 'mongoose';
+import { Schema, model } from 'mongoose';
 
 const studentSchema = new Schema(
   {
@@ -31,6 +30,16 @@ const studentSchema = new Schema(
   {
     timestamps: true,
     versionKey: false,
+  },
+);
+
+// Додаємо текстовий індекс: кажемо MongoDB, що по полю name можна робити $text
+studentSchema.index(
+  { name: 'text' },
+  {
+    name: 'StudnetTextIndex',
+    weights: { name: 10 },
+    default_language: 'english',
   },
 );
 
