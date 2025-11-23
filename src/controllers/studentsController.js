@@ -17,7 +17,10 @@ export const getStudents = async (req, res) => {
   } = req.query;
   const skip = (page - 1) * perPage;
   // Створюємо базовий запит
-  const studentsQuery = Student.find();
+  const studentsQuery = Student.find(
+    // Додаємо критерій пошуку тільки студентів поточного користувача
+    { userId: req.user._id },
+  );
   // Текстовий пошук по name (працює лише якщо створено текстовий індекс)
   if (search) {
     studentsQuery.where({
@@ -56,11 +59,10 @@ export const getStudents = async (req, res) => {
 // Отримати одного студента за id
 export const getStudentById = async (req, res, next) => {
   const { studentId } = req.params;
-  const student = await Student.findById(studentId);
-  // Код що був до цього
-  // if (!student) {
-  //   return res.status(404).json({ message: 'Student not found' });
-  // }
+  const student = await Student.findOne({
+    _Id: studentId,
+    userId: req.user._id,
+  });
 
   // Додаємо базову обробку помилки замість res.status(404)
   if (!student) {
@@ -73,7 +75,12 @@ export const getStudentById = async (req, res, next) => {
 
 // Новий контролер
 export const createStudent = async (req, res) => {
-  const student = await Student.create(req.body);
+  const student = await Student.create({
+    ...req.body,
+    // Додаємо властивість userId
+    userId: req.user._id,
+  });
+
   res.status(201).json(student);
 };
 
@@ -81,10 +88,10 @@ export const deleteStudent = async (req, res, next) => {
   const { studentId } = req.params;
   const student = await Student.findOneAndDelete({
     _id: studentId,
+    userId: req.user._id,
   });
   if (!student) {
-    next(createHttpError(404, 'Student Not Found'));
-    return;
+    return next(createHttpError(404, 'Student Not Found'));
   }
   res.status(200).json(student);
 };
@@ -94,7 +101,7 @@ export const updateStudent = async (req, res, next) => {
   const { studentId } = req.params;
 
   const student = await Student.findOneAndUpdate(
-    { _id: studentId }, // Шукаємо по id
+    { _id: studentId, userId: req.user._id }, // Шукаємо по userId
     req.body,
     { new: true }, // повертаємо оновлений документ
   );

@@ -22,9 +22,15 @@ const studentSchema = new Schema(
       type: Number,
       required: true,
     },
-    omDuty: {
+    oтDuty: {
       type: Boolean,
-      defalt: false,
+      default: false,
+    },
+    // Нова властивість
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
     },
   },
   {
@@ -37,7 +43,7 @@ const studentSchema = new Schema(
 studentSchema.index(
   { name: 'text' },
   {
-    name: 'StudnetTextIndex',
+    name: 'StudentTextIndex',
     weights: { name: 10 },
     default_language: 'english',
   },
