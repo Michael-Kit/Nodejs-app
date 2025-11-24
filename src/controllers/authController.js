@@ -31,7 +31,7 @@ export const registerUser = async (req, res, next) => {
   setSessionCookies(res, newSession);
 
   // Відправляємо дані користувача (без пароля) у відповіді
-  res.status(201).json({ newUser });
+  res.status(201).json(newUser);
 };
 
 export const loginUser = async (req, res, next) => {
