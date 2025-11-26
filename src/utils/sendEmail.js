@@ -9,6 +9,10 @@ const transporter = nodemailer.createTransport({
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASSWORD,
   },
+  secure: false, // для порту 587 треба ставити false (STARTTLS)
+  tls: {
+    rejectUnauthorized: false, // ← дозволяє самопідписані сертифікати
+  },
 });
 
 export const sendEmail = async (options) => {

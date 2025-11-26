@@ -12,6 +12,7 @@ import studentsRoutes from './routes/studentsRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 
 import cookieParser from 'cookie-parser';
+import userRoutes from './routes/userRoutes.js';
 
 const app = express();
 // Використовуємо значення з .env або дефолтний порт 3000
@@ -37,6 +38,9 @@ app.get('/', (req, res) => {
 // підключаємо групу маршрутів студента
 app.use(authRoutes);
 app.use(studentsRoutes);
+
+// Додаємо раути користувача
+app.use(userRoutes);
 
 // обробка помилок від celebrate (валідація)
 app.use(errors());

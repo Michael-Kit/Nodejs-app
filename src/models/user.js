@@ -18,12 +18,18 @@ const userSchema = new Schema(
       type: String,
       required: true,
     },
+    // Нова властивість
+    avatar: {
+      type: String,
+      required: false,
+      default: 'https://ac.goit.global/fullstack/react/default-avatar.jpg',
+    },
   },
   { timestamps: true, versionKey: false },
 );
 userSchema.pre('save', function (next) {
   if (!this.username) {
-    this.username - this.email;
+    this.username = this.email;
   }
   next();
 });
